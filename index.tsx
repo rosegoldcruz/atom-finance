@@ -626,7 +626,7 @@ const SafetyPage = () => (
           <div className="flex justify-between items-center bg-atom-bg p-5 border border-atom-success/30 rounded hover:border-atom-success transition-all cursor-pointer">
             <div>
               <div className="text-sm font-bold text-white uppercase font-mono">Gas-Price Ceiling</div>
-              <div className="text-[11px] text-atom-muted font-mono mt-1">Halt all transactions if Base Fee > 250 Gwei.</div>
+              <div className="text-[11px] text-atom-muted font-mono mt-1">Halt all transactions if Base Fee &gt; 250 Gwei.</div>
             </div>
             <ToggleRight size={32} className="text-atom-success" />
           </div>
