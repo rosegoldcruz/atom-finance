@@ -1,0 +1,221 @@
+:root {
+  color-scheme: dark;
+  --safe-top: env(safe-area-inset-top);
+  --safe-right: env(safe-area-inset-right);
+  --safe-bottom: env(safe-area-inset-bottom);
+  --safe-left: env(safe-area-inset-left);
+}
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  font-size: 16px;
+}
+
+body {
+  margin: 0;
+  background: #050505;
+  color: #e4e4e7;
+  overflow-x: hidden;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+/* Avoid iOS zoom on input focus */
+input,
+select,
+textarea {
+  font-size: 16px;
+}
+
+/* Smooth, rubbery scroll */
+body {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: none;
+}
+
+/* Tech borders */
+.tech-border {
+  position: relative;
+  border: 1px solid #1f1f1f;
+}
+
+.tech-border::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 10px;
+  height: 10px;
+  border-top: 1px solid rgba(82, 82, 91, 0.9);
+  border-left: 1px solid rgba(82, 82, 91, 0.9);
+  transition: all 0.25s ease;
+  pointer-events: none;
+}
+
+.tech-border::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 10px;
+  height: 10px;
+  border-bottom: 1px solid rgba(82, 82, 91, 0.9);
+  border-right: 1px solid rgba(82, 82, 91, 0.9);
+  transition: all 0.25s ease;
+  pointer-events: none;
+}
+
+.tech-border:hover::before,
+.tech-border:hover::after {
+  border-color: rgba(0, 240, 255, 0.75);
+  width: 100%;
+  height: 100%;
+  opacity: 0.12;
+}
+
+/* Neon/glass primitives */
+.glass {
+  background: radial-gradient(120% 120% at 20% 0%, rgba(0, 240, 255, 0.12) 0%, rgba(255, 0, 229, 0.06) 35%, rgba(10, 10, 10, 0.78) 70%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+.neon-ring {
+  box-shadow:
+    0 0 0 1px rgba(0, 240, 255, 0.15),
+    0 0 22px rgba(0, 240, 255, 0.18),
+    0 0 48px rgba(255, 0, 229, 0.08);
+}
+
+.neon-text {
+  text-shadow:
+    0 0 18px rgba(0, 240, 255, 0.35),
+    0 0 30px rgba(255, 0, 229, 0.18);
+}
+
+.gradient-sheen {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.22), rgba(168, 85, 247, 0.18), rgba(255, 0, 229, 0.16));
+}
+
+.tap {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.tap:active {
+  transform: scale(0.985);
+}
+
+.btn-cta {
+  min-height: 52px;
+  border-radius: 16px;
+  padding: 14px 16px;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  letter-spacing: 0.02em;
+  font-weight: 700;
+  text-transform: uppercase;
+  border: 1px solid rgba(0, 240, 255, 0.22);
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.18), rgba(168, 85, 247, 0.16), rgba(255, 0, 229, 0.12));
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(0, 240, 255, 0.18),
+    0 0 30px rgba(0, 240, 255, 0.22),
+    0 0 55px rgba(255, 0, 229, 0.12);
+}
+
+.btn-cta:hover {
+  border-color: rgba(0, 240, 255, 0.35);
+  box-shadow:
+    0 20px 55px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(0, 240, 255, 0.22),
+    0 0 38px rgba(0, 240, 255, 0.32),
+    0 0 70px rgba(255, 0, 229, 0.18);
+}
+
+.btn-cta:active {
+  transform: scale(0.98);
+}
+
+.safe-pad {
+  padding-top: calc(12px + var(--safe-top));
+  padding-left: calc(12px + var(--safe-left));
+  padding-right: calc(12px + var(--safe-right));
+}
+
+.safe-bottom {
+  padding-bottom: calc(16px + var(--safe-bottom));
+}
+
+/* Viewport helpers */
+.app-viewport {
+  min-height: 100dvh;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* CRT Effect Overlay (subtle) */
+.crt-line {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.1));
+  background-size: 100% 4px;
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  opacity: 0.03;
+}
+
+@keyframes pulseGlow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.25)) drop-shadow(0 0 26px rgba(255, 0, 229, 0.12));
+  }
+  50% {
+    filter: drop-shadow(0 0 22px rgba(0, 240, 255, 0.42)) drop-shadow(0 0 46px rgba(255, 0, 229, 0.18));
+  }
+}
+
+.pulse-glow {
+  animation: pulseGlow 1.6s ease-in-out infinite;
+}
+

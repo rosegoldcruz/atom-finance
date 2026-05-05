@@ -43,8 +43,203 @@ import {
   Briefcase,
   ShieldAlert,
   Sliders,
-  ChevronDown
+  ChevronDown,
+  LayoutGrid,
+  Bot,
+  Sparkles,
+  ReceiptText
 } from 'lucide-react';
+
+type MobileTab = 'dashboard' | 'bots' | 'strategies' | 'profit' | 'settings';
+
+const formatUsd = (amount: number) =>
+  amount.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+
+const MiniSparkline: React.FC<{ points: number[] }> = ({ points }) => {
+  const width = 220;
+  const height = 48;
+  const max = Math.max(...points);
+  const min = Math.min(...points);
+  const range = Math.max(1, max - min);
+
+  const d = points
+    .map((p, i) => {
+      const x = (i / (points.length - 1)) * width;
+      const y = height - ((p - min) / range) * height;
+      return `${i === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`;
+    })
+    .join(' ');
+
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-12">
+      <defs>
+        <linearGradient id="spark" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#00F0FF" stopOpacity="0.95" />
+          <stop offset="55%" stopColor="#A855F7" stopOpacity="0.9" />
+          <stop offset="100%" stopColor="#FF00E5" stopOpacity="0.95" />
+        </linearGradient>
+      </defs>
+      <path d={d} fill="none" stroke="url(#spark)" strokeWidth="2.5" strokeLinecap="round" />
+      <path d={`${d} L ${width} ${height} L 0 ${height} Z`} fill="url(#spark)" opacity="0.10" />
+    </svg>
+  );
+};
+
+const HeroMobile: React.FC<{
+  profitTodayUsd: number;
+  onExecute: () => void;
+}> = ({ profitTodayUsd, onExecute }) => {
+  const [points, setPoints] = useState<number[]>(() =>
+    Array.from({ length: 26 }, (_, i) => 60 + Math.sin(i / 2.2) * 9 + Math.random() * 6)
+  );
+
+  useEffect(() => {
+    const t = window.setInterval(() => {
+      setPoints((prev) => {
+        const last = prev[prev.length - 1] ?? 70;
+        const next = Math.max(45, Math.min(90, last + (Math.random() - 0.5) * 9));
+        return [...prev.slice(1), next];
+      });
+    }, 900);
+    return () => window.clearInterval(t);
+  }, []);
+
+  return (
+    <section className="glass tech-border neon-ring safe-pad rounded-3xl p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="text-[11px] uppercase tracking-[0.28em] text-atom-muted font-mono">
+            Today’s Profit
+          </div>
+          <div className="mt-1 text-[44px] leading-none font-black tracking-tight text-white font-mono neon-text pulse-glow break-words">
+            +{formatUsd(profitTodayUsd)}
+          </div>
+        </div>
+        <div className="w-28 shrink-0">
+          <div className="text-[10px] uppercase tracking-[0.24em] text-atom-muted font-mono text-right">
+            Pulse
+          </div>
+          <div className="mt-1 opacity-90">
+            <MiniSparkline points={points} />
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-4">
+        <button
+          onClick={onExecute}
+          className="btn-cta tap w-full text-white"
+          aria-label="Execute Aave flash loan arbitrage"
+        >
+          EXECUTE AAVE FLASH LOAN ARB
+        </button>
+        <div className="mt-2 text-[11px] text-atom-muted font-mono flex items-center justify-between">
+          <span>MEV Shield: ARMED</span>
+          <span className="text-atom-accent">Tap to fire</span>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const OpportunityCardMobile: React.FC<{
+  title: string;
+  pair: string;
+  profitUsd: number;
+  spreadBps: number;
+  gasEth: number;
+  mevShield: boolean;
+  onTap: () => void;
+}> = ({ title, pair, profitUsd, spreadBps, gasEth, mevShield, onTap }) => {
+  return (
+    <button
+      className="tap w-full text-left glass tech-border rounded-2xl p-4 neon-ring"
+      onClick={onTap}
+      style={{ minHeight: 120 }}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="text-[11px] uppercase tracking-[0.28em] text-atom-muted font-mono">
+            {title}
+          </div>
+          <div className="mt-1 text-lg font-bold text-white font-mono truncate">{pair}</div>
+        </div>
+        <div className="shrink-0 text-right">
+          <div className="text-[11px] uppercase tracking-[0.28em] text-atom-muted font-mono">Net</div>
+          <div className="mt-1 text-xl font-extrabold text-atom-success font-mono neon-text">
+            +{formatUsd(profitUsd)}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-3 grid grid-cols-3 gap-2">
+        <div className="rounded-xl bg-atom-bg/60 border border-atom-border p-2">
+          <div className="text-[10px] text-atom-muted font-mono uppercase tracking-widest">Spread</div>
+          <div className="mt-1 text-[13px] text-white font-mono font-bold">{spreadBps.toFixed(1)} bps</div>
+        </div>
+        <div className="rounded-xl bg-atom-bg/60 border border-atom-border p-2">
+          <div className="text-[10px] text-atom-muted font-mono uppercase tracking-widest">Gas</div>
+          <div className="mt-1 text-[13px] text-white font-mono font-bold">{gasEth.toFixed(3)} ETH</div>
+        </div>
+        <div className="rounded-xl bg-atom-bg/60 border border-atom-border p-2">
+          <div className="text-[10px] text-atom-muted font-mono uppercase tracking-widest">Shield</div>
+          <div className={`mt-1 text-[13px] font-mono font-bold ${mevShield ? 'text-atom-accent' : 'text-atom-muted'}`}>
+            {mevShield ? 'ON' : 'OFF'}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-3 flex items-center justify-between">
+        <div className="text-[11px] text-atom-muted font-mono">Swipeable feel • One-tap execute</div>
+        <div className="text-[11px] text-atom-accent font-mono font-bold">READY →</div>
+      </div>
+    </button>
+  );
+};
+
+const BottomNavMobile: React.FC<{ value: MobileTab; onChange: (tab: MobileTab) => void }> = ({ value, onChange }) => {
+  const items: { key: MobileTab; label: string; icon: any }[] = [
+    { key: 'dashboard', label: 'Dashboard', icon: LayoutGrid },
+    { key: 'bots', label: 'Live Bots', icon: Bot },
+    { key: 'strategies', label: 'Strategies', icon: Sparkles },
+    { key: 'profit', label: 'Profit Log', icon: ReceiptText },
+    { key: 'settings', label: 'Settings', icon: Settings }
+  ];
+
+  return (
+    <nav
+      className="fixed left-0 right-0 bottom-0 z-50 safe-bottom"
+      style={{ paddingLeft: 'var(--safe-left)', paddingRight: 'var(--safe-right)' }}
+      aria-label="Bottom Navigation"
+    >
+      <div className="mx-auto max-w-xl px-3">
+        <div className="glass tech-border neon-ring rounded-2xl px-2 py-2">
+          <div className="grid grid-cols-5 gap-1">
+            {items.map((it) => {
+              const active = value === it.key;
+              const Icon = it.icon;
+              return (
+                <button
+                  key={it.key}
+                  onClick={() => onChange(it.key)}
+                  className={`tap flex flex-col items-center justify-center rounded-xl px-1 py-2 min-h-[52px] transition-colors ${
+                    active ? 'bg-atom-bg/60 border border-atom-border' : 'bg-transparent'
+                  }`}
+                  aria-current={active ? 'page' : undefined}
+                >
+                  <Icon size={18} className={active ? 'text-atom-accent' : 'text-atom-muted'} />
+                  <span className={`mt-1 text-[10px] font-mono ${active ? 'text-white' : 'text-atom-muted'}`}>
+                    {it.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </nav>
+  );
+};
 
 // --- Types ---
 
@@ -801,22 +996,200 @@ const Sidebar: React.FC<{ activeTab: string, setActiveTab: (t: string) => void }
 
 const AtomApp = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [mobileTab, setMobileTab] = useState<MobileTab>('dashboard');
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const update = () => {
+      setIsMobile(window.matchMedia('(max-width: 1023px)').matches);
+    };
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
+  const executeFromHero = () => {
+    // Preserve existing flow by routing into the dashboard where executions already live.
+    setActiveTab('dashboard');
+    setMobileTab('dashboard');
+  };
+
+  const profitTodayUsd = 4821;
   
+  if (isMobile) {
+    return (
+      <div className="app-viewport bg-atom-bg text-atom-text font-sans">
+        <div className="safe-pad">
+          <div className="mx-auto max-w-xl">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-[11px] font-mono uppercase tracking-[0.34em] text-atom-muted">Atom Finance</div>
+                <div className="mt-1 text-xl font-black text-white font-mono tracking-tight neon-text">ARBITRAGE CONSOLE</div>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-atom-success animate-pulse" />
+                <span className="text-[10px] font-mono uppercase tracking-widest text-atom-success">LIVE</span>
+              </div>
+            </div>
+
+            <div className="mt-4 space-y-4">
+              {mobileTab === 'dashboard' && (
+                <>
+                  <HeroMobile profitTodayUsd={profitTodayUsd} onExecute={executeFromHero} />
+                  <section>
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-[11px] font-mono uppercase tracking-[0.34em] text-atom-muted">Opportunities</h2>
+                      <button className="tap text-[11px] font-mono text-atom-accent">Refresh</button>
+                    </div>
+                    <div className="mt-3 space-y-3">
+                      <OpportunityCardMobile
+                        title="Aave Flash Arb"
+                        pair="WETH → USDC → WETH"
+                        profitUsd={312}
+                        spreadBps={18.2}
+                        gasEth={0.012}
+                        mevShield={true}
+                        onTap={executeFromHero}
+                      />
+                      <OpportunityCardMobile
+                        title="Tri-Arb"
+                        pair="WBTC/ETH/USDT"
+                        profitUsd={186}
+                        spreadBps={12.7}
+                        gasEth={0.010}
+                        mevShield={true}
+                        onTap={executeFromHero}
+                      />
+                      <OpportunityCardMobile
+                        title="Liquidation Snipe"
+                        pair="Aave v3 — stETH"
+                        profitUsd={548}
+                        spreadBps={22.4}
+                        gasEth={0.021}
+                        mevShield={false}
+                        onTap={executeFromHero}
+                      />
+                    </div>
+                  </section>
+                </>
+              )}
+
+              {mobileTab === 'bots' && (
+                <section className="glass tech-border neon-ring rounded-3xl p-4">
+                  <div className="text-[11px] font-mono uppercase tracking-[0.34em] text-atom-muted">Live Bots</div>
+                  <div className="mt-3 space-y-2">
+                    {BOTS.map((b) => (
+                      <div key={b.id} className="flex items-center justify-between rounded-2xl bg-atom-bg/60 border border-atom-border p-3">
+                        <div>
+                          <div className="text-white font-mono font-bold text-sm">{b.name}</div>
+                          <div className="text-[11px] text-atom-muted font-mono">{b.role} • {b.region}</div>
+                        </div>
+                        <div className={`text-[11px] font-mono font-bold ${b.status === 'RUNNING' ? 'text-atom-success' : b.status === 'ERROR' ? 'text-atom-error' : 'text-atom-muted'}`}>
+                          {b.status}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {mobileTab === 'strategies' && (
+                <section className="glass tech-border neon-ring rounded-3xl p-4">
+                  <div className="text-[11px] font-mono uppercase tracking-[0.34em] text-atom-muted">Strategies</div>
+                  <div className="mt-3 space-y-3">
+                    {STRATEGIES.map((s) => (
+                      <div key={s.id} className="rounded-2xl bg-atom-bg/60 border border-atom-border p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="text-white font-mono font-bold truncate">{s.name}</div>
+                            <div className="mt-1 text-[11px] text-atom-muted font-mono">{s.description}</div>
+                          </div>
+                          <div className={`text-[10px] font-mono uppercase tracking-widest px-2 py-1 rounded border ${
+                            s.status === 'ACTIVE'
+                              ? 'text-atom-success border-atom-success/30 bg-atom-success/10'
+                              : s.status === 'PAUSED'
+                                ? 'text-atom-warning border-atom-warning/30 bg-atom-warning/10'
+                                : 'text-atom-muted border-atom-border bg-atom-bg/40'
+                          }`}>
+                            {s.status}
+                          </div>
+                        </div>
+                        <div className="mt-3 grid grid-cols-3 gap-2">
+                          <div className="rounded-xl bg-atom-bg/60 border border-atom-border p-2">
+                            <div className="text-[10px] text-atom-muted font-mono uppercase tracking-widest">Win</div>
+                            <div className="mt-1 text-[13px] text-white font-mono font-bold">{s.winRate.toFixed(1)}%</div>
+                          </div>
+                          <div className="rounded-xl bg-atom-bg/60 border border-atom-border p-2">
+                            <div className="text-[10px] text-atom-muted font-mono uppercase tracking-widest">Avg</div>
+                            <div className="mt-1 text-[13px] text-white font-mono font-bold">${s.avgProfit.toFixed(0)}</div>
+                          </div>
+                          <div className="rounded-xl bg-atom-bg/60 border border-atom-border p-2">
+                            <div className="text-[10px] text-atom-muted font-mono uppercase tracking-widest">Risk</div>
+                            <div className="mt-1 text-[13px] text-atom-accent font-mono font-bold">{s.riskRating}</div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {mobileTab === 'profit' && (
+                <section className="glass tech-border neon-ring rounded-3xl p-4">
+                  <div className="text-[11px] font-mono uppercase tracking-[0.34em] text-atom-muted">Profit Log</div>
+                  <div className="mt-3 rounded-2xl bg-atom-bg/60 border border-atom-border p-4">
+                    <div className="text-white font-mono font-bold text-sm">Net +{formatUsd(profitTodayUsd)}</div>
+                    <div className="mt-2 text-[11px] text-atom-muted font-mono">Full profit ledger stays on desktop panel for now.</div>
+                  </div>
+                </section>
+              )}
+
+              {mobileTab === 'settings' && (
+                <section className="glass tech-border neon-ring rounded-3xl p-4">
+                  <div className="text-[11px] font-mono uppercase tracking-[0.34em] text-atom-muted">Settings</div>
+                  <div className="mt-3 space-y-2">
+                    <div className="rounded-2xl bg-atom-bg/60 border border-atom-border p-4 flex items-center justify-between">
+                      <div>
+                        <div className="text-white font-mono font-bold text-sm">CRT Overlay</div>
+                        <div className="text-[11px] text-atom-muted font-mono">Subtle scanlines</div>
+                      </div>
+                      <ToggleRight size={22} className="text-atom-success" />
+                    </div>
+                    <div className="rounded-2xl bg-atom-bg/60 border border-atom-border p-4 flex items-center justify-between">
+                      <div>
+                        <div className="text-white font-mono font-bold text-sm">Sound Synthesis</div>
+                        <div className="text-[11px] text-atom-muted font-mono">Haptics-friendly clicks</div>
+                      </div>
+                      <ToggleLeft size={22} className="text-atom-muted" />
+                    </div>
+                  </div>
+                </section>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div style={{ height: 110 }} />
+        <BottomNavMobile value={mobileTab} onChange={setMobileTab} />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-screen bg-atom-bg text-atom-text font-sans overflow-hidden">
-        <TopStatusBar />
-        <div className="flex flex-1 overflow-hidden">
-            <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-            <main className="flex-1 overflow-hidden relative bg-atom-bg">
-                {activeTab === 'dashboard' && <DashboardPage />}
-                {activeTab === 'live' && <LiveActivityPage />}
-                {activeTab === 'strategies' && <StrategiesPage />}
-                {activeTab === 'bots' && <BotsPage />}
-                {activeTab === 'profit' && <ProfitPage />}
-                {activeTab === 'safety' && <SafetyPage />}
-                {activeTab === 'settings' && <SettingsPage />}
-            </main>
-        </div>
+      <TopStatusBar />
+      <div className="flex flex-1 overflow-hidden">
+        <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+        <main className="flex-1 overflow-hidden relative bg-atom-bg">
+          {activeTab === 'dashboard' && <DashboardPage />}
+          {activeTab === 'live' && <LiveActivityPage />}
+          {activeTab === 'strategies' && <StrategiesPage />}
+          {activeTab === 'bots' && <BotsPage />}
+          {activeTab === 'profit' && <ProfitPage />}
+          {activeTab === 'safety' && <SafetyPage />}
+          {activeTab === 'settings' && <SettingsPage />}
+        </main>
+      </div>
     </div>
   );
 };
