@@ -1036,10 +1036,186 @@ const AtomApp = () => {
               {mobileTab === 'dashboard' && (
                 <>
                   <HeroMobile profitTodayUsd={profitTodayUsd} onExecute={executeFromHero} />
+
+                  {/* Global System Health - Full Metrics */}
+                  <section className="glass tech-border neon-ring rounded-3xl p-5 space-y-4">
+                    <div className="text-[11px] font-mono uppercase tracking-[0.34em] text-atom-muted flex items-center gap-2">
+                      <Activity size={14} className="text-atom-accent" /> Global System Health
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="rounded-2xl bg-atom-bg/60 border border-atom-border p-3">
+                        <div className="flex items-center gap-2 mb-2">
+                          <TrendingUp size={14} className="text-atom-success" />
+                          <div className="text-[9px] text-atom-muted font-mono uppercase tracking-widest">24h Yield</div>
+                        </div>
+                        <div className="text-xl font-extrabold text-white font-mono neon-text">+$4,291</div>
+                        <div className="text-[10px] text-atom-success font-mono mt-1">+12.4%</div>
+                      </div>
+                      <div className="rounded-2xl bg-atom-bg/60 border border-atom-border p-3">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Target size={14} className="text-atom-accent" />
+                          <div className="text-[9px] text-atom-muted font-mono uppercase tracking-widest">Success</div>
+                        </div>
+                        <div className="text-xl font-extrabold text-white font-mono neon-text">96.8%</div>
+                        <div className="text-[10px] text-atom-success font-mono mt-1">+0.5%</div>
+                      </div>
+                      <div className="rounded-2xl bg-atom-bg/60 border border-atom-border p-3">
+                        <div className="flex items-center gap-2 mb-2">
+                          <ShieldCheck size={14} className="text-atom-warning" />
+                          <div className="text-[9px] text-atom-muted font-mono uppercase tracking-widest">MEV Risk</div>
+                        </div>
+                        <div className="text-xl font-extrabold text-white font-mono">Low</div>
+                        <div className="text-[10px] text-atom-muted font-mono mt-1">Protected</div>
+                      </div>
+                      <div className="rounded-2xl bg-atom-bg/60 border border-atom-border p-3">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Zap size={14} className="text-atom-accent" />
+                          <div className="text-[9px] text-atom-muted font-mono uppercase tracking-widest">Gas Eff</div>
+                        </div>
+                        <div className="text-xl font-extrabold text-white font-mono">1.4x</div>
+                        <div className="text-[10px] text-atom-success font-mono mt-1">+0.2x</div>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 pt-2 border-t border-atom-border/50">
+                      <div className="text-center">
+                        <div className="text-[9px] text-atom-muted font-mono uppercase tracking-widest">Latency</div>
+                        <div className="text-sm font-bold text-white font-mono mt-1">12.4ms</div>
+                      </div>
+                      <div className="text-center border-l border-r border-atom-border/50">
+                        <div className="text-[9px] text-atom-muted font-mono uppercase tracking-widest">Uptime</div>
+                        <div className="text-sm font-bold text-white font-mono mt-1">99.98%</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-[9px] text-atom-muted font-mono uppercase tracking-widest">Status</div>
+                        <div className="text-sm font-bold text-atom-success font-mono mt-1">OPTIMAL</div>
+                      </div>
+                    </div>
+                  </section>
+
+                  {/* Yield Trajectory - Full 7D Scrollable Blocks */}
+                  <section className="glass tech-border neon-ring rounded-3xl p-5 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="text-[11px] font-mono uppercase tracking-[0.34em] text-atom-muted flex items-center gap-2">
+                        <BarChart3 size={14} className="text-atom-accent" /> Yield Trajectory (7D)
+                      </div>
+                      <div className="flex gap-1">
+                        {['1H', '6H', '24H', '7D'].map(t => (
+                          <button key={t} className={`px-2 py-1 text-[9px] font-bold font-mono rounded border tap ${t === '7D' ? 'border-atom-accent text-atom-accent bg-atom-accent/10' : 'border-atom-border text-atom-muted'}`}>{t}</button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex items-end gap-1 h-32 border-b border-atom-border/50 pb-2 overflow-x-auto">
+                      {[30, 45, 40, 60, 55, 75, 70, 90, 85, 110, 100, 130, 120, 150, 140, 180, 170, 210, 200, 240, 230, 260, 250, 290, 280, 310].map((h, i) => (
+                        <div key={i} className="flex-shrink-0 w-3 bg-atom-accent/20 border-t border-atom-accent/40 tap" style={{ height: `${(h / 310) * 100}%` }} />
+                      ))}
+                    </div>
+                    <div className="overflow-x-auto -mx-5 px-5">
+                      <div className="space-y-1 font-mono text-[10px] min-w-max">
+                        {[
+                          { block: '18,234,926', time: '14:32:18', profit: '+$1,550', gas: '0.018 ETH', status: 'success' },
+                          { block: '18,234,925', time: '14:32:06', profit: '+$890', gas: '0.012 ETH', status: 'success' },
+                          { block: '18,234,924', time: '14:31:54', profit: '+$320', gas: '0.009 ETH', status: 'success' },
+                          { block: '18,234,923', time: '14:31:42', profit: '+$0', gas: '0.008 ETH', status: 'skipped' },
+                          { block: '18,234,922', time: '14:31:30', profit: '+$1,240', gas: '0.015 ETH', status: 'success' },
+                          { block: '18,234,921', time: '14:31:18', profit: '+$670', gas: '0.011 ETH', status: 'success' },
+                          { block: '18,234,920', time: '14:31:06', profit: '+$0', gas: '0.000 ETH', status: 'skipped' },
+                        ].map((entry, i) => (
+                          <div key={i} className={`flex items-center justify-between rounded-lg p-2 ${entry.status === 'success' ? 'bg-atom-success/5 border border-atom-success/20' : 'bg-atom-bg/40 border border-atom-border/30'}`}>
+                            <div className="flex items-center gap-3">
+                              {entry.status === 'success' ? <CheckCircle size={12} className="text-atom-success" /> : <XCircle size={12} className="text-atom-muted" />}
+                              <span className="text-white font-bold">#{entry.block}</span>
+                              <span className="text-atom-muted">{entry.time}</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <span className={entry.status === 'success' ? 'text-atom-success font-bold' : 'text-atom-muted'}>{entry.profit}</span>
+                              <span className="text-atom-muted text-[9px]">{entry.gas}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </section>
+
+                  {/* Network Nodes - Full Grid Stacked */}
+                  <section className="glass tech-border neon-ring rounded-3xl p-5 space-y-4">
+                    <div className="text-[11px] font-mono uppercase tracking-[0.34em] text-atom-muted flex items-center gap-2">
+                      <Globe size={14} className="text-atom-accent" /> Network Nodes
+                    </div>
+                    <div className="space-y-2">
+                      {[
+                        { name: 'US-EAST-WORKER', status: 'online', latency: '14ms', load: 24 },
+                        { name: 'EU-WEST-SOLVER', status: 'online', latency: '14ms', load: 38 },
+                        { name: 'AP-SOUTH-SENTINEL', status: 'online', latency: '14ms', load: 12 },
+                        { name: 'BR-SAO-EXECUTOR', status: 'degraded', latency: '1.2s LATENCY', load: 0 }
+                      ].map((node, i) => (
+                        <div key={i} className="rounded-2xl bg-atom-bg/60 border border-atom-border p-3 relative overflow-hidden">
+                          <div className="absolute bottom-0 left-0 h-0.5 bg-atom-accent/10 w-full">
+                            <div className="h-full bg-atom-accent transition-all" style={{ width: `${node.load}%` }} />
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className={`w-2 h-2 rounded-full ${node.status === 'online' ? 'bg-atom-success' : 'bg-atom-error animate-pulse'}`} />
+                              <div>
+                                <div className="text-white font-mono font-bold text-sm">{node.name}</div>
+                                <div className="text-[10px] text-atom-muted font-mono mt-0.5">{node.latency}</div>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-[9px] text-atom-muted font-mono uppercase">Load</div>
+                              <div className="text-sm font-bold text-atom-accent font-mono">{node.load}%</div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+
+                  {/* Threat Log - Full Entries */}
+                  <section className="glass tech-border neon-ring rounded-3xl p-5 space-y-4">
+                    <div className="text-[11px] font-mono uppercase tracking-[0.34em] text-atom-muted flex items-center gap-2">
+                      <ShieldAlert size={14} className="text-atom-error" /> Threat Log
+                    </div>
+                    <div className="space-y-2 font-mono text-[10px]">
+                      <div className="rounded-lg bg-atom-warning/5 border border-atom-warning/20 p-3">
+                        <div className="flex items-start gap-2">
+                          <AlertTriangle size={14} className="text-atom-warning flex-shrink-0 mt-0.5" />
+                          <div className="min-w-0">
+                            <div className="text-atom-muted">[14:22:03]</div>
+                            <div className="text-atom-warning mt-1 leading-relaxed">DETECTED: MEV-SANDWICH ATTEMPT ON BLOCK 18,234,912</div>
+                            <div className="text-atom-muted mt-1 text-[9px]">Threat vector: Flashbots mempool scan • Action: TX_DELAYED</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="rounded-lg bg-atom-error/5 border border-atom-error/20 p-3">
+                        <div className="flex items-start gap-2">
+                          <AlertOctagon size={14} className="text-atom-error flex-shrink-0 mt-0.5" />
+                          <div className="min-w-0">
+                            <div className="text-atom-muted">[14:25:47]</div>
+                            <div className="text-atom-error mt-1 leading-relaxed">BLOCKED: MALICIOUS RPC INJECTION FROM 192.168.0.2</div>
+                            <div className="text-atom-muted mt-1 text-[9px]">Attack type: Contract poisoning • Action: IP_BLACKLISTED</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="rounded-lg bg-atom-success/5 border border-atom-success/20 p-3">
+                        <div className="flex items-start gap-2">
+                          <ShieldCheck size={14} className="text-atom-success flex-shrink-0 mt-0.5" />
+                          <div className="min-w-0">
+                            <div className="text-atom-muted">[14:20:12]</div>
+                            <div className="text-atom-success mt-1 leading-relaxed">VERIFIED: All strategy logic hashes match trusted build</div>
+                            <div className="text-atom-muted mt-1 text-[9px]">Integrity check: PASSED • No unauthorized modifications detected</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+
+                  {/* Opportunities */}
                   <section>
                     <div className="flex items-center justify-between">
-                      <h2 className="text-[11px] font-mono uppercase tracking-[0.34em] text-atom-muted">Opportunities</h2>
-                      <button className="tap text-[11px] font-mono text-atom-accent">Refresh</button>
+                      <h2 className="text-[11px] font-mono uppercase tracking-[0.34em] text-atom-muted">Live Opportunities</h2>
+                      <button className="tap text-[11px] font-mono text-atom-accent flex items-center gap-1">
+                        <RefreshCw size={12} /> Refresh
+                      </button>
                     </div>
                     <div className="mt-3 space-y-3">
                       <OpportunityCardMobile
