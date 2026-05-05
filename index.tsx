@@ -1251,95 +1251,342 @@ const AtomApp = () => {
               )}
 
               {mobileTab === 'bots' && (
-                <section className="glass tech-border neon-ring rounded-3xl p-4">
-                  <div className="text-[11px] font-mono uppercase tracking-[0.34em] text-atom-muted">Live Bots</div>
-                  <div className="mt-3 space-y-2">
-                    {BOTS.map((b) => (
-                      <div key={b.id} className="flex items-center justify-between rounded-2xl bg-atom-bg/60 border border-atom-border p-3">
-                        <div>
-                          <div className="text-white font-mono font-bold text-sm">{b.name}</div>
-                          <div className="text-[11px] text-atom-muted font-mono">{b.role} • {b.region}</div>
+                <>
+                  <section className="glass tech-border neon-ring rounded-3xl p-5 space-y-4">
+                    <div className="text-[11px] font-mono uppercase tracking-[0.34em] text-atom-muted flex items-center gap-2">
+                      <Terminal size={14} className="text-atom-accent" /> Infrastructure Cluster
+                    </div>
+                    <div className="space-y-3">
+                      {BOTS.map((b) => (
+                        <div key={b.id} className="rounded-2xl bg-atom-bg/60 border border-atom-border p-4 relative overflow-hidden">
+                          <div className="absolute bottom-0 left-0 h-0.5 bg-atom-accent/10 w-full">
+                            <div className="h-full bg-atom-accent transition-all" style={{ width: `${b.load}%` }} />
+                          </div>
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                              <div className={`w-2 h-2 rounded-full ${b.status === 'RUNNING' ? 'bg-atom-success animate-pulse' : b.status === 'ERROR' ? 'bg-atom-error animate-pulse' : 'bg-atom-muted'}`} />
+                              <div>
+                                <div className="text-white font-mono font-bold text-base">{b.name}</div>
+                                <div className="text-[10px] text-atom-muted font-mono uppercase tracking-widest mt-0.5">{b.role}</div>
+                              </div>
+                            </div>
+                            <div className={`text-[10px] font-mono uppercase px-2 py-1 rounded border ${
+                              b.status === 'RUNNING'
+                                ? 'text-atom-success border-atom-success/30 bg-atom-success/10'
+                                : b.status === 'ERROR'
+                                  ? 'text-atom-error border-atom-error/30 bg-atom-error/10'
+                                  : 'text-atom-muted border-atom-border bg-atom-bg/40'
+                            }`}>
+                              {b.status}
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-3 gap-2 mb-3">
+                            <div className="rounded-lg bg-atom-bg/60 border border-atom-border p-2">
+                              <div className="text-[9px] text-atom-muted font-mono uppercase tracking-widest">Uptime</div>
+                              <div className="text-sm font-bold text-white font-mono mt-1">{b.uptime}</div>
+                            </div>
+                            <div className="rounded-lg bg-atom-bg/60 border border-atom-border p-2">
+                              <div className="text-[9px] text-atom-muted font-mono uppercase tracking-widest">Load</div>
+                              <div className="text-sm font-bold text-atom-accent font-mono mt-1">{b.load}%</div>
+                            </div>
+                            <div className="rounded-lg bg-atom-bg/60 border border-atom-border p-2">
+                              <div className="text-[9px] text-atom-muted font-mono uppercase tracking-widest">Region</div>
+                              <div className="text-[11px] font-bold text-white font-mono mt-1">{b.region.split('-').slice(0, 2).join('-')}</div>
+                            </div>
+                          </div>
+                          <div className="text-[9px] text-atom-muted font-mono">
+                            Last heartbeat: {new Date(b.lastHeartbeat).toLocaleTimeString()}
+                          </div>
                         </div>
-                        <div className={`text-[11px] font-mono font-bold ${b.status === 'RUNNING' ? 'text-atom-success' : b.status === 'ERROR' ? 'text-atom-error' : 'text-atom-muted'}`}>
-                          {b.status}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </section>
+                      ))}
+                    </div>
+                  </section>
+
+                  {/* Bot Actions */}
+                  <section className="glass tech-border neon-ring rounded-3xl p-5 space-y-3">
+                    <div className="text-[11px] font-mono uppercase tracking-[0.34em] text-atom-muted">Quick Actions</div>
+                    <button className="tap w-full btn-cta text-white flex items-center justify-center gap-2">
+                      <RefreshCw size={16} /> RESTART ALL WORKERS
+                    </button>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button className="tap py-3 bg-atom-bg/60 border border-atom-border text-[10px] font-bold text-atom-text rounded-xl uppercase flex items-center justify-center gap-2">
+                        <Activity size={14} /> Monitor
+                      </button>
+                      <button className="tap py-3 bg-atom-bg/60 border border-atom-border text-[10px] font-bold text-atom-text rounded-xl uppercase flex items-center justify-center gap-2">
+                        <History size={14} /> Logs
+                      </button>
+                    </div>
+                  </section>
+                </>
               )}
 
               {mobileTab === 'strategies' && (
-                <section className="glass tech-border neon-ring rounded-3xl p-4">
-                  <div className="text-[11px] font-mono uppercase tracking-[0.34em] text-atom-muted">Strategies</div>
-                  <div className="mt-3 space-y-3">
-                    {STRATEGIES.map((s) => (
-                      <div key={s.id} className="rounded-2xl bg-atom-bg/60 border border-atom-border p-4">
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="min-w-0">
-                            <div className="text-white font-mono font-bold truncate">{s.name}</div>
-                            <div className="mt-1 text-[11px] text-atom-muted font-mono">{s.description}</div>
-                          </div>
-                          <div className={`text-[10px] font-mono uppercase tracking-widest px-2 py-1 rounded border ${
-                            s.status === 'ACTIVE'
-                              ? 'text-atom-success border-atom-success/30 bg-atom-success/10'
-                              : s.status === 'PAUSED'
-                                ? 'text-atom-warning border-atom-warning/30 bg-atom-warning/10'
-                                : 'text-atom-muted border-atom-border bg-atom-bg/40'
-                          }`}>
-                            {s.status}
-                          </div>
-                        </div>
-                        <div className="mt-3 grid grid-cols-3 gap-2">
-                          <div className="rounded-xl bg-atom-bg/60 border border-atom-border p-2">
-                            <div className="text-[10px] text-atom-muted font-mono uppercase tracking-widest">Win</div>
-                            <div className="mt-1 text-[13px] text-white font-mono font-bold">{s.winRate.toFixed(1)}%</div>
-                          </div>
-                          <div className="rounded-xl bg-atom-bg/60 border border-atom-border p-2">
-                            <div className="text-[10px] text-atom-muted font-mono uppercase tracking-widest">Avg</div>
-                            <div className="mt-1 text-[13px] text-white font-mono font-bold">${s.avgProfit.toFixed(0)}</div>
-                          </div>
-                          <div className="rounded-xl bg-atom-bg/60 border border-atom-border p-2">
-                            <div className="text-[10px] text-atom-muted font-mono uppercase tracking-widest">Risk</div>
-                            <div className="mt-1 text-[13px] text-atom-accent font-mono font-bold">{s.riskRating}</div>
-                          </div>
-                        </div>
+                <>
+                  <section className="glass tech-border neon-ring rounded-3xl p-5 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="text-[11px] font-mono uppercase tracking-[0.34em] text-atom-muted flex items-center gap-2">
+                        <Server size={14} className="text-atom-accent" /> Strategy Engine
                       </div>
-                    ))}
-                  </div>
-                </section>
+                      <button className="tap text-[10px] font-mono text-atom-accent font-bold uppercase flex items-center gap-1">
+                        <Zap size={12} /> New
+                      </button>
+                    </div>
+                    <div className="space-y-3">
+                      {STRATEGIES.map((s) => (
+                        <div key={s.id} className="rounded-2xl bg-atom-bg/60 border border-atom-border p-4">
+                          <div className="flex items-start justify-between gap-3 mb-3">
+                            <div className="min-w-0">
+                              <div className="text-white font-mono font-bold text-base truncate">{s.name}</div>
+                              <div className="mt-1 text-[11px] text-atom-muted font-mono leading-relaxed">{s.description}</div>
+                            </div>
+                            <div className={`text-[10px] font-mono uppercase tracking-widest px-2 py-1 rounded border flex-shrink-0 ${
+                              s.status === 'ACTIVE'
+                                ? 'text-atom-success border-atom-success/30 bg-atom-success/10'
+                                : s.status === 'PAUSED'
+                                  ? 'text-atom-warning border-atom-warning/30 bg-atom-warning/10'
+                                  : 'text-atom-muted border-atom-border bg-atom-bg/40'
+                            }`}>
+                              {s.status}
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-4 gap-2 mb-3">
+                            <div className="rounded-lg bg-atom-bg/60 border border-atom-border p-2">
+                              <div className="text-[9px] text-atom-muted font-mono uppercase tracking-widest">Win</div>
+                              <div className="text-sm font-bold text-white font-mono mt-1">{s.winRate.toFixed(1)}%</div>
+                            </div>
+                            <div className="rounded-lg bg-atom-bg/60 border border-atom-border p-2">
+                              <div className="text-[9px] text-atom-muted font-mono uppercase tracking-widest">Avg</div>
+                              <div className="text-sm font-bold text-atom-success font-mono mt-1">${s.avgProfit.toFixed(0)}</div>
+                            </div>
+                            <div className="rounded-lg bg-atom-bg/60 border border-atom-border p-2">
+                              <div className="text-[9px] text-atom-muted font-mono uppercase tracking-widest">Gas</div>
+                              <div className="text-[11px] font-bold text-white font-mono mt-1">{s.avgGas}</div>
+                            </div>
+                            <div className="rounded-lg bg-atom-bg/60 border border-atom-border p-2">
+                              <div className="text-[9px] text-atom-muted font-mono uppercase tracking-widest">Risk</div>
+                              <div className={`text-sm font-bold font-mono mt-1 ${s.riskRating === 'LOW' ? 'text-atom-success' : s.riskRating === 'MEDIUM' ? 'text-atom-warning' : 'text-atom-error'}`}>
+                                {s.riskRating}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="space-y-1">
+                            <div className="text-[9px] text-atom-muted font-mono uppercase tracking-widest">Guardrails</div>
+                            <div className="grid grid-cols-2 gap-2">
+                              {Object.entries(s.guardrails).slice(0, 2).map(([key, val]) => (
+                                <div key={key} className="text-[10px] font-mono">
+                                  <span className="text-atom-muted">{key}: </span>
+                                  <span className="text-atom-accent font-bold">{val}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+
+                  {/* Strategy Controls */}
+                  <section className="glass tech-border neon-ring rounded-3xl p-5 space-y-3">
+                    <div className="text-[11px] font-mono uppercase tracking-[0.34em] text-atom-muted">Global Controls</div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button className="tap py-3 bg-atom-success/10 border border-atom-success/30 text-[10px] font-bold text-atom-success rounded-xl uppercase flex items-center justify-center gap-2">
+                        <Play size={14} /> Start All
+                      </button>
+                      <button className="tap py-3 bg-atom-error/10 border border-atom-error/30 text-[10px] font-bold text-atom-error rounded-xl uppercase flex items-center justify-center gap-2">
+                        <Pause size={14} /> Pause All
+                      </button>
+                    </div>
+                  </section>
+                </>
               )}
 
               {mobileTab === 'profit' && (
-                <section className="glass tech-border neon-ring rounded-3xl p-4">
-                  <div className="text-[11px] font-mono uppercase tracking-[0.34em] text-atom-muted">Profit Log</div>
-                  <div className="mt-3 rounded-2xl bg-atom-bg/60 border border-atom-border p-4">
-                    <div className="text-white font-mono font-bold text-sm">Net +{formatUsd(profitTodayUsd)}</div>
-                    <div className="mt-2 text-[11px] text-atom-muted font-mono">Full profit ledger stays on desktop panel for now.</div>
-                  </div>
-                </section>
+                <>
+                  <section className="glass tech-border neon-ring rounded-3xl p-5 space-y-4">
+                    <div className="text-[11px] font-mono uppercase tracking-[0.34em] text-atom-muted flex items-center gap-2">
+                      <TrendingUp size={14} className="text-atom-accent" /> P&L Analytics
+                    </div>
+                    <div className="space-y-3">
+                      <div className="rounded-2xl bg-atom-bg/60 border border-atom-border p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <DollarSign size={16} className="text-atom-success" />
+                          <div className="text-[9px] text-atom-muted font-mono uppercase tracking-widest">Total Realized Value</div>
+                        </div>
+                        <div className="text-3xl font-extrabold text-white font-mono neon-text">$422,912</div>
+                        <div className="text-[11px] text-atom-success font-mono mt-1">+8.2% this month</div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="rounded-2xl bg-atom-bg/60 border border-atom-border p-3">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Zap size={14} className="text-atom-error" />
+                            <div className="text-[9px] text-atom-muted font-mono uppercase tracking-widest">Network Fees</div>
+                          </div>
+                          <div className="text-xl font-extrabold text-white font-mono">28.4 ETH</div>
+                          <div className="text-[10px] text-atom-error font-mono mt-1">+1.2 ETH</div>
+                        </div>
+                        <div className="rounded-2xl bg-atom-bg/60 border border-atom-border p-3">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Briefcase size={14} className="text-atom-accent" />
+                            <div className="text-[9px] text-atom-muted font-mono uppercase tracking-widest">Treasury</div>
+                          </div>
+                          <div className="text-xl font-extrabold text-white font-mono">$12,400</div>
+                          <div className="text-[10px] text-atom-muted font-mono mt-1">Operator bal</div>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+
+                  {/* Revenue Distribution */}
+                  <section className="glass tech-border neon-ring rounded-3xl p-5 space-y-4">
+                    <div className="text-[11px] font-mono uppercase tracking-[0.34em] text-atom-muted flex items-center gap-2">
+                      <PieChart size={14} className="text-atom-accent" /> Revenue Distribution
+                    </div>
+                    <div className="space-y-3">
+                      {[
+                        { label: 'Arbitrage', value: 65, color: 'bg-atom-accent', textColor: 'text-atom-accent' },
+                        { label: 'Liquidation', value: 25, color: 'bg-atom-success', textColor: 'text-atom-success' },
+                        { label: 'MEV Relay', value: 10, color: 'bg-atom-warning', textColor: 'text-atom-warning' }
+                      ].map(item => (
+                        <div key={item.label} className="rounded-2xl bg-atom-bg/60 border border-atom-border p-3">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="text-sm font-bold text-white font-mono">{item.label}</div>
+                            <div className={`text-xl font-extrabold font-mono ${item.textColor}`}>{item.value}%</div>
+                          </div>
+                          <div className="h-2 bg-atom-bg rounded-full overflow-hidden">
+                            <div className={`h-full ${item.color} transition-all`} style={{ width: `${item.value}%` }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="rounded-lg bg-atom-bg/60 border border-atom-border p-3 text-[10px] font-mono">
+                      <div className="flex items-center justify-between">
+                        <span className="text-atom-muted">Audited via Block 18,234,912</span>
+                        <span className="text-atom-success font-bold">VERIFIED</span>
+                      </div>
+                    </div>
+                  </section>
+
+                  {/* Recent Transactions */}
+                  <section className="glass tech-border neon-ring rounded-3xl p-5 space-y-4">
+                    <div className="text-[11px] font-mono uppercase tracking-[0.34em] text-atom-muted flex items-center gap-2">
+                      <ReceiptText size={14} className="text-atom-accent" /> Recent Payouts
+                    </div>
+                    <div className="space-y-2 font-mono text-[10px]">
+                      {[
+                        { time: '14:32', type: 'Flash Arb', amount: '+$1,550', status: 'success' },
+                        { time: '14:28', type: 'Liquidation', amount: '+$2,240', status: 'success' },
+                        { time: '14:22', type: 'Tri-Arb', amount: '+$670', status: 'success' },
+                        { time: '14:18', type: 'Flash Arb', amount: '+$890', status: 'success' },
+                      ].map((tx, i) => (
+                        <div key={i} className="flex items-center justify-between rounded-lg bg-atom-success/5 border border-atom-success/20 p-3">
+                          <div className="flex items-center gap-3">
+                            <CheckCircle size={12} className="text-atom-success" />
+                            <div>
+                              <div className="text-white font-bold">{tx.type}</div>
+                              <div className="text-atom-muted text-[9px] mt-0.5">{tx.time}</div>
+                            </div>
+                          </div>
+                          <div className="text-atom-success font-bold text-sm">{tx.amount}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                </>
               )}
 
               {mobileTab === 'settings' && (
-                <section className="glass tech-border neon-ring rounded-3xl p-4">
-                  <div className="text-[11px] font-mono uppercase tracking-[0.34em] text-atom-muted">Settings</div>
-                  <div className="mt-3 space-y-2">
-                    <div className="rounded-2xl bg-atom-bg/60 border border-atom-border p-4 flex items-center justify-between">
-                      <div>
-                        <div className="text-white font-mono font-bold text-sm">CRT Overlay</div>
-                        <div className="text-[11px] text-atom-muted font-mono">Subtle scanlines</div>
-                      </div>
-                      <ToggleRight size={22} className="text-atom-success" />
+                <>
+                  <section className="glass tech-border neon-ring rounded-3xl p-5 space-y-4">
+                    <div className="text-[11px] font-mono uppercase tracking-[0.34em] text-atom-muted flex items-center gap-2">
+                      <Settings size={14} className="text-atom-accent" /> Configuration
                     </div>
-                    <div className="rounded-2xl bg-atom-bg/60 border border-atom-border p-4 flex items-center justify-between">
+                    <div className="space-y-3">
                       <div>
-                        <div className="text-white font-mono font-bold text-sm">Sound Synthesis</div>
-                        <div className="text-[11px] text-atom-muted font-mono">Haptics-friendly clicks</div>
+                        <label className="text-[10px] text-atom-muted font-mono uppercase tracking-widest block mb-2">
+                          Primary RPC Endpoint (WSS)
+                        </label>
+                        <input
+                          type="text"
+                          defaultValue="wss://eth-mainnet.alchemyapi.io/v2/********"
+                          className="w-full bg-atom-bg/60 border border-atom-border rounded-xl p-3 text-[11px] font-mono text-atom-accent outline-none focus:border-atom-accent"
+                        />
                       </div>
-                      <ToggleLeft size={22} className="text-atom-muted" />
+                      <div>
+                        <label className="text-[10px] text-atom-muted font-mono uppercase tracking-widest block mb-2">
+                          Relay Policy
+                        </label>
+                        <select className="w-full bg-atom-bg/60 border border-atom-border rounded-xl p-3 text-[11px] font-mono text-white outline-none focus:border-atom-accent appearance-none">
+                          <option>FLASHBOTS (PRIVATE)</option>
+                          <option>EDEN-SHARE (MEV)</option>
+                          <option>PUBLIC MEMPOOL</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-atom-muted font-mono uppercase tracking-widest block mb-2">
+                          Engine Priority
+                        </label>
+                        <select className="w-full bg-atom-bg/60 border border-atom-border rounded-xl p-3 text-[11px] font-mono text-white outline-none focus:border-atom-accent appearance-none">
+                          <option>MAX_PROFIT</option>
+                          <option>MIN_LATENCY</option>
+                          <option>STABLE_ONLY</option>
+                        </select>
+                      </div>
                     </div>
-                  </div>
-                </section>
+                  </section>
+
+                  {/* Interface Experience */}
+                  <section className="glass tech-border neon-ring rounded-3xl p-5 space-y-4">
+                    <div className="text-[11px] font-mono uppercase tracking-[0.34em] text-atom-muted">Interface</div>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between rounded-2xl bg-atom-bg/60 border border-atom-border p-4">
+                        <div>
+                          <div className="text-white font-mono font-bold text-sm">CRT Overlay</div>
+                          <div className="text-[10px] text-atom-muted font-mono mt-0.5">Subtle scanlines</div>
+                        </div>
+                        <ToggleRight size={28} className="text-atom-success" />
+                      </div>
+                      <div className="flex items-center justify-between rounded-2xl bg-atom-bg/60 border border-atom-border p-4">
+                        <div>
+                          <div className="text-white font-mono font-bold text-sm">Sound Synthesis</div>
+                          <div className="text-[10px] text-atom-muted font-mono mt-0.5">Haptics-friendly clicks</div>
+                        </div>
+                        <ToggleLeft size={28} className="text-atom-muted" />
+                      </div>
+                    </div>
+                  </section>
+
+                  {/* Build Integrity */}
+                  <section className="glass tech-border neon-ring rounded-3xl p-5 space-y-4">
+                    <div className="text-[11px] font-mono uppercase tracking-[0.34em] text-atom-muted flex items-center gap-2">
+                      <ShieldCheck size={14} className="text-atom-success" /> Build Integrity
+                    </div>
+                    <div className="space-y-2 font-mono text-[11px]">
+                      <div className="flex justify-between items-center rounded-lg bg-atom-bg/60 border border-atom-border p-3">
+                        <span className="text-atom-muted uppercase">Core Version:</span>
+                        <span className="text-white font-bold">v4.2.1-STABLE</span>
+                      </div>
+                      <div className="flex justify-between items-center rounded-lg bg-atom-bg/60 border border-atom-border p-3">
+                        <span className="text-atom-muted uppercase">Aeon Engine:</span>
+                        <span className="text-white font-bold">BUILD_8821</span>
+                      </div>
+                      <div className="flex justify-between items-center rounded-lg bg-atom-bg/60 border border-atom-border p-3">
+                        <span className="text-atom-muted uppercase">UI Hash:</span>
+                        <span className="text-white font-bold">0X92F...A1</span>
+                      </div>
+                      <div className="flex justify-between items-center rounded-lg bg-atom-success/5 border border-atom-success/20 p-3">
+                        <span className="text-atom-muted uppercase">Signature:</span>
+                        <span className="text-atom-success font-bold flex items-center gap-1">
+                          <CheckCircle size={12} /> VERIFIED
+                        </span>
+                      </div>
+                    </div>
+                  </section>
+
+                  {/* Save Button */}
+                  <button className="tap w-full btn-cta text-white flex items-center justify-center gap-2">
+                    <Check size={16} /> SAVE PROFILE
+                  </button>
+                </>
               )}
             </div>
           </div>
