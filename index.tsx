@@ -1169,7 +1169,7 @@ const AtomApp = () => {
           </div>
         </div>
 
-        <div style={{ height: 110 }} />
+        <div style={{ height: 130 }} />
         <BottomNavMobile value={mobileTab} onChange={setMobileTab} />
       </div>
     );
