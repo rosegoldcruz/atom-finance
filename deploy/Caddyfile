@@ -1,0 +1,18 @@
+# Optional HTTPS front door. Start it with: docker compose --profile proxy up -d
+# Set ATOM_DOMAIN to the public hostname (for example atom.example.com).
+# Leave WEB_PORT published if you also want plain HTTP on 8080.
+
+{$ATOM_DOMAIN} {
+  encode gzip
+  request_body {
+    max_size 20MB
+  }
+
+  handle /api/* {
+    reverse_proxy api:8787
+  }
+
+  handle {
+    reverse_proxy web:80
+  }
+}
