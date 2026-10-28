@@ -1,0 +1,6 @@
+timestamp,pair,size_sol,buy_dex,sell_dex,net_sol,net_usd,gross_bps,net_bps,window_key
+2026-10-27T17:53:45-07:00,SOL/USDC,10,JUP-circular:Kipseli,JUP-circular:Deriverse+BisonFi+BisonFi+TesseraV,0.000483437,0.048916,0.688,0.483,SOL/USDC|JUP-circular
+2026-10-27T17:55:15-07:00,SOL/USDT,10,JUP-circular:Meteora DLMM+BisonFi+GoonFi V2+Deriverse,JUP-circular:JupLend AMM+Deriverse+Kipseli,0.000210942,0.021344,0.416,0.211,SOL/USDT|JUP-circular
+2026-10-27T18:10:12-07:00,SOL/USDT,10,JUP-circular:Kipseli+Deriverse+Manifest,JUP-circular:JupLend AMM+Byreal+TesseraV,0.001022274,0.103359,1.227,1.022,SOL/USDT|JUP-circular
+2026-10-27T19:17:34-07:00,SOL/USDC,10,JUP-circular:TesseraV+GoonFi V2,JUP-circular:TesseraV+Meteora DLMM,0.000285802,0.029095,0.491,0.286,SOL/USDC|JUP-circular
+2026-10-27T19:18:50-07:00,SOL/USDT,10,JUP-circular:TesseraV+Kipseli+Deriverse,JUP-circular:Deriverse+Kipseli,0.034311184,3.492966,34.516,34.311,SOL/USDT|JUP-circular
