@@ -12,6 +12,8 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 ENV NODE_ENV=production
 COPY --from=build /app /app
+# A CRLF checkout turns `set -eu` into `set -eu\r`, and the shell then loops on "Illegal option".
+RUN sed -i 's/\r$//' deploy/api-entrypoint.sh && chmod +x deploy/api-entrypoint.sh
 EXPOSE 8787
 CMD ["sh", "deploy/api-entrypoint.sh"]
 

@@ -1,0 +1,9 @@
+# Linux containers run these files. CRLF makes `set -eu` fail as `set: Illegal option -`.
+* text=auto eol=lf
+
+*.sh       text eol=lf
+Dockerfile text eol=lf
+*.yml      text eol=lf
+*.yaml     text eol=lf
+Caddyfile  text eol=lf
+nginx.conf text eol=lf
