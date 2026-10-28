@@ -4,7 +4,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends openssl ca-cert
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
-ENV DATABASE_URL=postgresql://atom:atom@postgres:5432/atom
+ENV DATABASE_URL=postgresql://atom@127.0.0.1:5432/atom
 RUN npx prisma generate && npm run build
 
 FROM node:22-bookworm-slim AS api

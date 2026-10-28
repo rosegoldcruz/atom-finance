@@ -6,14 +6,14 @@ ATOM runs as three long-lived containers: the web UI, the API, and Postgres. Cad
 
 1. Install Docker Engine and the Compose plugin.
 2. Clone the repo and check out the release you want.
-3. Create the env file and replace every `change-me` value:
+3. Create the env file and replace every `<password>` and `<long-random-string>` placeholder. Do not commit that file.
 
    ```bash
    cp .env.example .env
    openssl rand -hex 32   # use this as AUTH_SECRET
    ```
 
-   Set `POSTGRES_PASSWORD` and put the same password in `DATABASE_URL`. Set `APP_ORIGIN` to the URL operators will open, for example `https://atom.example.com`. Set `COOKIE_SECURE=true` when that URL is HTTPS.
+   Set `POSTGRES_PASSWORD` and use that same value in place of `<password>` inside `DATABASE_URL`. Set `APP_ORIGIN` to the URL operators will open, for example `https://atom.example.com`. Set `COOKIE_SECURE=true` when that URL is HTTPS.
 
 4. Start the desk:
 
@@ -23,13 +23,13 @@ ATOM runs as three long-lived containers: the web UI, the API, and Postgres. Cad
 
    Open `http://<server>:8080`. Postgres is bound to `127.0.0.1` only.
 
-5. Create the first workspace in the UI, or load the sample scanner logs. The sample password is refused while `NODE_ENV=production`, so set a real `SEED_USER_PASSWORD` first:
+5. Create the first workspace in the UI, or load the sample scanner logs:
 
    ```bash
    docker compose exec api npx tsx scripts/seed.ts
    ```
 
-   The ingestion key is printed once inside the container at `data/local-ingestion-key.txt`.
+   If `SEED_USER_PASSWORD` is unset, the command prints a one-time password. Copy it from the logs. It is not written into the image or the repo. The ingestion key is printed once inside the container at `data/local-ingestion-key.txt`.
 
 ## Optional Caddy
 
@@ -48,7 +48,7 @@ Caddy terminates TLS and forwards `/api` to the API and everything else to the w
 - Updates: `git pull && docker compose up -d --build`
 - The volume `atom_postgres` keeps the database across recreates. Do not run `docker compose down -v` unless you mean to delete it.
 
-The API process is `tsx server/index.ts` after `prisma migrate deploy`. It exits on boot if `AUTH_SECRET` or `DATABASE_URL` still contain `change-me`.
+The API process is `tsx server/index.ts` after `prisma migrate deploy`. In production it exits on boot if `AUTH_SECRET` or `DATABASE_URL` is missing or still contains a placeholder (`change-me`, `<password>`, or `<long-random-string>`).
 
 ## Scanner
 

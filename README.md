@@ -20,13 +20,13 @@ Requirements: Node.js 22, Postgres 16.
 cp .env.example .env
 ```
 
-Edit `.env` so `DATABASE_URL` points at your local Postgres, for example:
+Edit the untracked `.env`. Replace `<password>` in `POSTGRES_PASSWORD` and `DATABASE_URL`, and set `AUTH_SECRET` from `openssl rand -hex 32`. A local URL looks like:
 
 ```
-DATABASE_URL=postgresql://atom:atom@127.0.0.1:5432/atom
+DATABASE_URL=postgresql://atom:<password>@127.0.0.1:5432/atom
 ```
 
-Do not leave `change-me` in a production `AUTH_SECRET`. For local development the API falls back to a development-only secret when `AUTH_SECRET` is unset.
+`AUTH_SECRET` is required. The API does not ship a fallback secret.
 
 ```bash
 npm install
@@ -36,15 +36,17 @@ npm run dev
 
 - Web: http://localhost:3000
 - API: http://127.0.0.1:8787
-- Sample login, after seed: `operator@atom.local` / `paper-observer`
+- Sample email, after seed: `operator@atom.local` (or `SEED_USER_EMAIL`). If `SEED_USER_PASSWORD` is unset, `npm run db:seed` prints a one-time password and does not store it in the repo.
 
 `npm run setup` applies migrations and loads `data/samples/*.csv`. Those files are the attached scanner logs, labeled example data. A fresh registration starts with an empty ledger and empty liquidation tables.
 
 ```bash
-npm test
+TEST_DATABASE_URL=postgresql://atom:<password>@127.0.0.1:5432/atom_test npm test
 npm run lint
 npm run build
 ```
+
+`TEST_DATABASE_URL` is only for the test database. Put the real URL in your shell, not in the repo.
 
 ## Self-hosting
 
@@ -160,7 +162,8 @@ npm run ingest -- --url http://127.0.0.1:8787 --key "$ATOM_INGEST_KEY" \
 | `AUTH_SECRET` | Pepper for session and ingestion-key hashes |
 | `APP_ORIGIN` | Public origin, used for Stripe return URLs |
 | `COOKIE_SECURE` | `true` behind HTTPS |
-| `SEED_USER_EMAIL` / `SEED_USER_PASSWORD` / `SEED_USER_NAME` | Optional sample workspace |
+| `SEED_USER_EMAIL` / `SEED_USER_PASSWORD` / `SEED_USER_NAME` | Sample workspace. If the password is unset, seed prints a one-time value |
+| `TEST_DATABASE_URL` | Postgres URL used by `npm test`. Not read by the running API |
 | `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` | Empty until billing is turned on |
 | `STRIPE_PRICE_DESK` / `STRIPE_PRICE_INSTITUTION` | Stripe price ids for the placeholder plans |
 | `POSTGRES_*`, `WEB_PORT`, `ATOM_DOMAIN` | Compose only |

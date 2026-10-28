@@ -3,12 +3,10 @@ import { promisify } from 'node:util';
 
 const scrypt = promisify(scryptCb);
 
-const DEV_AUTH_SECRET = 'dev-only-atom-secret-change-me';
-
 function pepper(): string {
-  if (process.env.AUTH_SECRET) return process.env.AUTH_SECRET;
-  if (process.env.NODE_ENV === 'production') throw new Error('AUTH_SECRET is required');
-  return DEV_AUTH_SECRET;
+  const secret = process.env.AUTH_SECRET;
+  if (!secret) throw new Error('AUTH_SECRET is required');
+  return secret;
 }
 
 export async function hashPassword(password: string): Promise<string> {

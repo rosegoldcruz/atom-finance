@@ -1,3 +1,4 @@
+import { randomBytes } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -6,6 +7,7 @@ import { PrismaClient } from '@prisma/client';
 import { createApp } from './app';
 import { parseCsv, roundTripCostSol } from '../domain/paper';
 
+const fixturePassword = randomBytes(18).toString('base64url');
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const prisma = new PrismaClient();
 const app = createApp(prisma);
@@ -42,7 +44,7 @@ test('auth, ingest, and dashboard use the sample ledger and isolate workspaces',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({
       email: 'operator@atom.local',
-      password: 'paper-observer',
+      password: fixturePassword,
       name: 'Operator',
       workspaceName: 'Sample desk',
     }),
@@ -144,7 +146,7 @@ test('auth, ingest, and dashboard use the sample ledger and isolate workspaces',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({
       email: 'other@atom.local',
-      password: 'paper-observer',
+      password: fixturePassword,
       name: 'Other',
       workspaceName: 'Empty desk',
     }),

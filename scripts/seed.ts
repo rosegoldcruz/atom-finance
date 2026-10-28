@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import { randomBytes } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -7,25 +8,41 @@ import { hashPassword, hashToken, newIngestionKey } from '../server/auth/crypto'
 import { parseCsv, roundTripCostSol, type CostConfig } from '../server/domain/paper';
 import { applyIngest } from '../server/ingest';
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const email = (process.env.SEED_USER_EMAIL || 'operator@atom.local').toLowerCase();
-const password = process.env.SEED_USER_PASSWORD || 'paper-observer';
-const name = process.env.SEED_USER_NAME || 'Operator';
-
-if (process.env.NODE_ENV === 'production' && password === 'paper-observer') {
-  console.error('Refusing to seed the local demo password in production. Set SEED_USER_PASSWORD.');
+if (!process.env.AUTH_SECRET) {
+  console.error('Set AUTH_SECRET before seeding. The API uses it when hashing sessions and ingestion keys.');
   process.exit(1);
 }
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const email = (process.env.SEED_USER_EMAIL || 'operator@atom.local').toLowerCase();
+const name = process.env.SEED_USER_NAME || 'Operator';
+const providedPassword = process.env.SEED_USER_PASSWORD;
 
 const prisma = new PrismaClient();
 const config = JSON.parse(readFileSync(path.join(root, 'data/samples/scanner.config.json'), 'utf8')) as { costs: CostConfig };
 const cost = roundTripCostSol(config.costs);
 
-const user = await prisma.user.upsert({
-  where: { email },
-  update: { name },
-  create: { email, name, passwordHash: await hashPassword(password) },
-});
+const existingUser = await prisma.user.findUnique({ where: { email } });
+const user = existingUser
+  ? await prisma.user.update({
+      where: { email },
+      data: providedPassword ? { name, passwordHash: await hashPassword(providedPassword) } : { name },
+    })
+  : await prisma.user.create({
+      data: { email, name, passwordHash: await hashPassword(providedPassword || createPassword()) },
+    });
+if (!existingUser && !providedPassword) {
+  console.log('SEED_USER_PASSWORD was unset. The one-time password was printed above.');
+}
+if (existingUser && !providedPassword) {
+  console.log(`User ${email} already exists. Password unchanged because SEED_USER_PASSWORD is unset.`);
+}
+
+function createPassword(): string {
+  const password = randomBytes(18).toString('base64url');
+  console.log(`SEED_USER_PASSWORD is unset. One-time password for ${email}: ${password}`);
+  return password;
+}
 
 const existingMembership = await prisma.workspaceMember.findFirst({
   where: { userId: user.id },

@@ -1,4 +1,10 @@
+import { randomBytes } from 'node:crypto';
 import { defineConfig } from 'vitest/config';
+
+const databaseUrl = process.env.TEST_DATABASE_URL;
+if (!databaseUrl || databaseUrl.includes('<password>')) {
+  throw new Error('Set TEST_DATABASE_URL to the test Postgres URL before running tests. Do not commit a password.');
+}
 
 export default defineConfig({
   test: {
@@ -6,8 +12,8 @@ export default defineConfig({
     fileParallelism: false,
     globalSetup: ['./server/test/globalSetup.ts'],
     env: {
-      DATABASE_URL: 'postgresql://atom:atom@127.0.0.1:5432/atom_test',
-      AUTH_SECRET: 'test-secret-test-secret-test-secret',
+      DATABASE_URL: databaseUrl,
+      AUTH_SECRET: process.env.AUTH_SECRET || randomBytes(32).toString('hex'),
       APP_ORIGIN: 'http://localhost:3000',
       NODE_ENV: 'test',
     },
