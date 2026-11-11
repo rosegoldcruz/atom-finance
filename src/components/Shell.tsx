@@ -59,7 +59,7 @@ export function Shell() {
     <div className="flex h-dvh flex-col bg-atom-bg text-atom-text">
       <header className="flex h-10 shrink-0 items-center justify-between border-b border-atom-border bg-atom-card px-4 font-mono text-[11px] lg:px-6">
         <div className="flex items-center gap-4">
-          <span className="font-bold uppercase tracking-widest text-atom-accent">Paper / read-only</span>
+          <span className="font-bold uppercase tracking-widest text-atom-accent">Solana arb</span>
           <span className="hidden text-atom-muted sm:inline">Scanner {scanner}</span>
         </div>
         <div className="flex items-center gap-4 text-atom-muted">
@@ -77,7 +77,7 @@ export function Shell() {
             <button onClick={() => navigate('/')} className="flex items-center gap-3 text-2xl font-bold tracking-tighter text-white">
               <span className="h-4 w-4 rotate-45 bg-atom-accent" /> ATOM
             </button>
-            <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.3em] text-atom-muted">Paper desk</p>
+            <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.3em] text-atom-muted">Arb console</p>
           </div>
           <nav className="flex-1 py-4">
             {NAV.map((item) => (

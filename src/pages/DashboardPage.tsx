@@ -1,34 +1,37 @@
 import { Link, useSearchParams } from 'react-router-dom';
 import { Activity, Target, TrendingUp, Zap } from 'lucide-react';
-import { Caveat, PageHeader, Panel, Sparkline, StateMessage, StatCard } from '../components/ui';
-import { formatBps, formatSignedUsd, formatSol } from '../lib/format';
+import { PageHeader, Panel, Sparkline, StateMessage, StatCard } from '../components/ui';
+import { formatBps, formatPhoenix, formatSignedUsd, formatSol } from '../lib/format';
 import { useApi } from '../lib/useApi';
-import type { DashboardPayload } from '../types';
+import type { DashboardPayload, OpportunityBoard } from '../types';
 
 export function DashboardPage() {
   const [params, setParams] = useSearchParams();
   const day = params.get('day');
   const query = day ? `/api/dashboard?day=${day}` : '/api/dashboard';
   const { data, error, loading } = useApi<DashboardPayload>(query);
+  const board = useApi<OpportunityBoard>('/api/opportunities');
 
   return (
     <div className="space-y-6 p-4 lg:p-6">
-      <PageHeader icon={Activity} title="DASHBOARD" subtitle="Hypothetical P&L from stored paper trades · America/Phoenix">
-        <div className="font-mono text-[10px] uppercase text-atom-muted">Quotes only · no fills</div>
+      <PageHeader icon={Activity} title="INEFFICIENCIES" subtitle="Solana DEX gaps from your scanner · ranked on this screen">
+        <div className="font-mono text-[10px] uppercase text-atom-muted">America/Phoenix</div>
       </PageHeader>
       {loading && !data ? <StateMessage title="Loading ledger" body="Reading stored paper trades." /> : null}
       {error ? <StateMessage title="Dashboard unavailable" body={error} /> : null}
+      {board.data ? <GapBoard board={board.data} /> : null}
+      {board.error ? <StateMessage title="Gap board unavailable" body={board.error} /> : null}
       {data ? (
         <>
-          <Caveat text={data.caveat} />
+          <p className="font-mono text-[10px] leading-relaxed text-atom-muted">{data.caveat}</p>
           <div className="glass rounded-3xl p-4 lg:hidden">
-            <div className="font-mono text-[11px] uppercase tracking-[0.28em] text-atom-muted">{data.selectedDay} hypothetical</div>
+            <div className="font-mono text-[11px] uppercase tracking-[0.28em] text-atom-muted">{data.selectedDay} quoted net</div>
             <div className="mt-1 font-mono text-4xl font-black text-white">{formatSignedUsd(data.kpis.dayNetUsd)}</div>
             <div className="mt-3">
               <Sparkline points={data.intraday.map((point) => point.cumulativeUsd)} />
             </div>
             <Link to="/app/profit" className="mt-3 block text-center font-mono text-[11px] uppercase tracking-widest text-atom-accent">
-              Open paper ledger
+              Open the ledger
             </Link>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -52,7 +55,7 @@ export function DashboardPage() {
             ) : null}
           </div>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <StatCard label={`${data.selectedDay} net USD`} value={formatSignedUsd(data.kpis.dayNetUsd)} detail="hypothetical" icon={TrendingUp} />
+            <StatCard label={`${data.selectedDay} net USD`} value={formatSignedUsd(data.kpis.dayNetUsd)} detail="quoted" icon={TrendingUp} />
             <StatCard label={`${data.selectedDay} net SOL`} value={formatSol(data.kpis.dayNetSol)} icon={Zap} />
             <StatCard label="Paper trades" value={String(data.kpis.dayTrades)} detail={`${data.kpis.dayTenX} cleared 10× fees`} icon={Target} />
             <StatCard label="All stored trades" value={String(data.kpis.allTimeTrades)} detail={formatSignedUsd(data.kpis.allTimeNetUsd)} icon={Activity} />
@@ -151,6 +154,55 @@ function PairTable({ rows }: { rows: DashboardPayload['byPair'] }) {
         ))}
       </tbody>
     </table>
+  );
+}
+
+function GapBoard({ board }: { board: OpportunityBoard }) {
+  return (
+    <section className="space-y-4">
+      <div className="grid gap-4 sm:grid-cols-3">
+        <StatCard label="Best Jupiter round trip" value={board.bestCircularBps === null ? '—' : formatBps(board.bestCircularBps)} detail={`${board.circularQuotes} quotes`} icon={Zap} />
+        <StatCard label="Tightest single-DEX gap" value={board.tightestDirectBps === null ? '—' : formatBps(board.tightestDirectBps)} detail={`${board.directQuotes} quotes`} icon={Target} />
+        <StatCard label="Routes on screen" value={String(board.circular.length + board.direct.length)} detail="sorted by spread" icon={Activity} />
+      </div>
+      <div className="grid gap-3 lg:grid-cols-2">
+        {board.circular.map((row) => (
+          <article key={row.id} className="tech-border bg-atom-card p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <div className="font-mono text-[10px] uppercase tracking-widest text-atom-muted">Jupiter · {row.sizeSol} SOL</div>
+                <div className="mt-1 font-mono text-lg font-bold text-white">{row.pair}</div>
+              </div>
+              <div className={`font-mono text-xl font-bold ${row.grossBps > 0 ? 'text-atom-success' : 'text-atom-warning'}`}>
+                {formatBps(row.grossBps)}
+              </div>
+            </div>
+            <p className="mt-3 font-mono text-[11px] leading-relaxed text-atom-muted">
+              {row.routeOut} → {row.routeBack}
+            </p>
+            <div className="mt-3 flex justify-between font-mono text-[11px]">
+              <span className="text-atom-muted">{formatPhoenix(row.timestamp)}</span>
+              <span className="text-white">{formatSignedUsd(row.netUsd)} · {row.netSol.toFixed(6)} SOL{row.tenXFees ? ' · 10×' : ''}</span>
+            </div>
+          </article>
+        ))}
+        {board.direct.map((row) => (
+          <article key={row.id} className="tech-border bg-atom-bg p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <div className="font-mono text-[10px] uppercase tracking-widest text-atom-muted">Direct · {row.sizeSol} SOL</div>
+                <div className="mt-1 font-mono text-lg font-bold text-white">{row.pair}</div>
+              </div>
+              <div className={`font-mono text-xl font-bold ${row.grossBps > 0 ? 'text-atom-success' : 'text-atom-muted'}`}>
+                {formatBps(row.grossBps)}
+              </div>
+            </div>
+            <p className="mt-3 font-mono text-[11px] text-atom-muted">{row.buyDex} → {row.sellDex}</p>
+            <div className="mt-3 font-mono text-[11px] text-white">{formatSignedUsd(row.netUsd)}</div>
+          </article>
+        ))}
+      </div>
+    </section>
   );
 }
 

@@ -35,6 +35,56 @@ function sumOf(value: number | null | undefined): number {
   return value ?? 0;
 }
 
+export async function opportunityBoard(prisma: PrismaClient, workspaceId: string) {
+  const [direct, circular, directCount, circularCount] = await Promise.all([
+    prisma.opportunity.findMany({
+      where: { workspaceId },
+      orderBy: { grossBps: 'desc' },
+      take: 12,
+    }),
+    prisma.circularQuote.findMany({
+      where: { workspaceId },
+      orderBy: { grossBps: 'desc' },
+      take: 8,
+    }),
+    prisma.opportunity.count({ where: { workspaceId } }),
+    prisma.circularQuote.count({ where: { workspaceId } }),
+  ]);
+  return {
+    caveat: CAVEAT,
+    directQuotes: directCount,
+    circularQuotes: circularCount,
+    tightestDirectBps: direct[0]?.grossBps ?? null,
+    bestCircularBps: circular[0]?.grossBps ?? null,
+    direct: direct.map((row) => ({
+      id: row.id,
+      timestamp: row.timestamp.toISOString(),
+      pair: row.pair,
+      sizeSol: row.sizeSol,
+      buyDex: row.buyDex,
+      sellDex: row.sellDex,
+      grossBps: row.grossBps,
+      netBps: row.netBps,
+      netSol: row.netSol,
+      netUsd: row.netUsd,
+      profitable: row.profitable,
+    })),
+    circular: circular.map((row) => ({
+      id: row.id,
+      timestamp: row.timestamp.toISOString(),
+      pair: row.pair,
+      sizeSol: row.sizeSol,
+      routeOut: row.routeOut,
+      routeBack: row.routeBack,
+      grossBps: row.grossBps,
+      netSol: row.netSol,
+      netUsd: row.netUsd,
+      profitable: row.profitable,
+      tenXFees: row.tenXFees,
+    })),
+  };
+}
+
 export async function dashboard(prisma: PrismaClient, workspaceId: string, requestedDay?: string) {
   const today = currentPhoenixDay();
   const dayGroups = await prisma.paperTrade.groupBy({

@@ -9,7 +9,7 @@ import { hashPassword, hashToken, newIngestionKey, newSessionToken, verifyPasswo
 import { PLANS, planById, stripeConfigured } from '../billing/plans';
 import { CAVEAT } from '../domain/paper';
 import { applyIngest } from '../ingest';
-import { activityFeed, bots, dashboard, liquidations, listTrades, strategies, tradesToCsv } from '../queries';
+import { activityFeed, bots, dashboard, liquidations, listTrades, opportunityBoard, strategies, tradesToCsv } from '../queries';
 
 const SESSION_COOKIE = 'atom_session';
 const SESSION_MS = 14 * 24 * 60 * 60 * 1000;
@@ -170,6 +170,12 @@ export function createApp(prisma: PrismaClient) {
       console.error('ingest failed', error instanceof Error ? error.message : 'unknown');
       return c.json({ error: 'ingest_failed' }, 500);
     }
+  });
+
+  app.get('/api/opportunities', async (c) => {
+    const auth = requireAuth(c);
+    if (!auth) return c.json({ error: 'unauthorized' }, 401);
+    return c.json(await opportunityBoard(prisma, auth.workspace.id));
   });
 
   app.get('/api/dashboard', async (c) => {

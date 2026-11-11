@@ -34,6 +34,40 @@ export type PaperTrade = {
   tenXFees: boolean;
 };
 
+export type OpportunityBoard = {
+  caveat: string;
+  directQuotes: number;
+  circularQuotes: number;
+  tightestDirectBps: number | null;
+  bestCircularBps: number | null;
+  direct: Array<{
+    id: string;
+    timestamp: string;
+    pair: string;
+    sizeSol: number;
+    buyDex: string;
+    sellDex: string;
+    grossBps: number;
+    netBps: number | null;
+    netSol: number;
+    netUsd: number;
+    profitable: boolean;
+  }>;
+  circular: Array<{
+    id: string;
+    timestamp: string;
+    pair: string;
+    sizeSol: number;
+    routeOut: string;
+    routeBack: string;
+    grossBps: number;
+    netSol: number;
+    netUsd: number;
+    profitable: boolean;
+    tenXFees: boolean;
+  }>;
+};
+
 export type DashboardPayload = {
   caveat: string;
   timezone: string;

@@ -15,26 +15,26 @@ export function LandingPage() {
         <nav className="flex items-center gap-4 font-mono text-[11px] uppercase tracking-widest text-atom-muted">
           <Link to="/pricing">Pricing</Link>
           <Link to="/login">Log in</Link>
-          <Link to="/register" className="border border-atom-accent px-3 py-2 text-atom-accent">Open a desk</Link>
+          <Link to="/register" className="border border-atom-accent px-3 py-2 text-atom-accent">Open the console</Link>
         </nav>
       </header>
       <main className="mx-auto max-w-6xl px-6 pb-20">
         <p className="font-mono text-[11px] uppercase tracking-[0.35em] text-atom-accent">Arbitrage Trustless On-chain Module</p>
         <h1 className="mt-4 max-w-3xl text-4xl font-black tracking-tight text-white sm:text-6xl">
-          A paper desk for quote gaps. No wallet. No sends.
+          The arb gaps, on one screen.
         </h1>
         <p className="mt-6 max-w-2xl text-lg leading-relaxed text-zinc-300">
-          ATOM ingests the read-only Solana scanner’s paper ledger and shows hypothetical P&amp;L by Phoenix day, pair, and route.
-          Numbers are quote-based upper bounds. The Aave V3 liquidation view is scaffolded and stays empty until a monitor posts real observations.
+          ATOM takes the Solana scanner off the CLI. Pair, size, venue, and spread land in a console you can actually read.
+          The tightest DEX-to-DEX gaps and the Jupiter round trips sit at the top, ranked by the quote.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Link to="/register" className="bg-atom-accent px-5 py-3 font-mono text-sm font-bold uppercase text-black">Create workspace</Link>
           <Link to="/pricing" className="border border-atom-border px-5 py-3 font-mono text-sm uppercase text-white">See plans</Link>
         </div>
         <div className="mt-14 grid gap-4 md:grid-cols-3">
-          <Feature title="Paper ledger" body="Per-day hypothetical net SOL and USD, the 10× fee flag, and the route that produced the quote." />
-          <Feature title="Scanner contract" body="Your scanner POSTs CSV-shaped JSON. Replays are idempotent. Pause stops intake without touching a wallet." />
-          <Feature title="Liquidation shelf" body="Schema for Aave V3 health factors on Arbitrum, Base, Optimism, and Polygon. No invented borrowers." />
+          <Feature title="Gap board" body="Every stored round trip, sorted by spread. You see the pair, the size, and both venues without tailing a log." />
+          <Feature title="Your scanner" body="The same CSV the CLI already writes posts into the console. New cycles show up as new rows." />
+          <Feature title="Where it pays" body="Phoenix-day net, the 10× fee tag, and the route that produced the quote stay one click from the board." />
         </div>
       </main>
     </div>

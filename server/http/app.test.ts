@@ -156,6 +156,19 @@ test('auth, ingest, and dashboard use the sample ledger and isolate workspaces',
   const otherBody = (await otherDash.json()) as { kpis: { allTimeTrades: number } };
   expect(otherBody.kpis.allTimeTrades).toBe(0);
 
+  const boardResponse = await app.request('/api/opportunities', { headers: { cookie } });
+  expect(boardResponse.status).toBe(200);
+  const board = (await boardResponse.json()) as {
+    directQuotes: number;
+    direct: Array<{ pair: string; grossBps: number }>;
+    circular: Array<{ pair: string; grossBps: number; profitable: boolean }>;
+  };
+  expect(board.directQuotes).toBe(985);
+  expect(board.direct[0]?.grossBps).toBeGreaterThan(board.direct[1]?.grossBps ?? -1e9);
+  expect(board.circular[0]).toMatchObject({ pair: 'SOL/USDT' });
+  expect(board.circular[0]?.grossBps).toBeGreaterThan(30);
+  expect(board.circular.some((row) => row.profitable)).toBe(true);
+
   const paused = await app.request('/api/safety', {
     method: 'PATCH',
     headers: { cookie, 'content-type': 'application/json' },
