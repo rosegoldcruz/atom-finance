@@ -1,0 +1,116 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --color-atom-bg: #050505;
+  --color-atom-card: #0a0a0a;
+  --color-atom-border: #1f1f1f;
+  --color-atom-accent: #00f0ff;
+  --color-atom-success: #00ff94;
+  --color-atom-warning: #ffd600;
+  --color-atom-error: #ff2e2e;
+  --color-atom-text: #e4e4e7;
+  --color-atom-muted: #52525b;
+}
+
+:root {
+  color-scheme: dark;
+  --safe-top: env(safe-area-inset-top);
+  --safe-right: env(safe-area-inset-right);
+  --safe-bottom: env(safe-area-inset-bottom);
+  --safe-left: env(safe-area-inset-left);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #050505;
+  color: #e4e4e7;
+  font-family: Inter, system-ui, sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+input,
+select,
+textarea {
+  font-size: 16px;
+}
+
+.tech-border {
+  position: relative;
+  border: 1px solid #1f1f1f;
+}
+
+.tech-border::before,
+.tech-border::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  pointer-events: none;
+  transition: all 0.25s ease;
+}
+
+.tech-border::before {
+  top: -1px;
+  left: -1px;
+  border-top: 1px solid rgba(82, 82, 91, 0.9);
+  border-left: 1px solid rgba(82, 82, 91, 0.9);
+}
+
+.tech-border::after {
+  right: -1px;
+  bottom: -1px;
+  border-right: 1px solid rgba(82, 82, 91, 0.9);
+  border-bottom: 1px solid rgba(82, 82, 91, 0.9);
+}
+
+.glass {
+  background: radial-gradient(120% 120% at 20% 0%, rgba(0, 240, 255, 0.12) 0%, rgba(255, 0, 229, 0.06) 35%, rgba(10, 10, 10, 0.78) 70%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(14px);
+}
+
+.neon-text {
+  text-shadow: 0 0 18px rgba(0, 240, 255, 0.35), 0 0 30px rgba(255, 0, 229, 0.18);
+}
+
+.crt-line {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.1));
+  background-size: 100% 4px;
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  opacity: 0.03;
+}
+
+html.crt-off .crt-line {
+  display: none;
+}
+
+.safe-bottom {
+  padding-bottom: calc(12px + var(--safe-bottom));
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+}
