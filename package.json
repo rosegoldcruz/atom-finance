@@ -21,6 +21,8 @@
     "@prisma/client": "^6.19.3",
     "dotenv": "^18.0.9",
     "hono": "^4.13.14",
+    "jose": "^6.2.17",
+    "keycloak-js": "^26.2.5",
     "lucide-react": "^0.562.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",

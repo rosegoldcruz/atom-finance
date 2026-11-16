@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Settings } from 'lucide-react';
 import { PageHeader, StateMessage } from '../components/ui';
 import { api } from '../lib/api';
+import { logoutKeycloak } from '../lib/keycloak';
 import { useAuth } from '../lib/auth';
 import { useApi } from '../lib/useApi';
 import type { SettingsPayload } from '../types';
@@ -53,8 +54,10 @@ export function SettingsPage() {
 
   async function logout() {
     await api('/api/auth/logout', { method: 'POST' });
+    const redirected = await logoutKeycloak();
+    if (redirected) return;
     await refresh();
-    navigate('/login');
+    navigate('/');
   }
 
   return (

@@ -5,7 +5,10 @@ import type { PrismaClient, User, Workspace } from '@prisma/client';
 import { Hono, type Context } from 'hono';
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
 import { z } from 'zod';
+import { randomBytes } from 'node:crypto';
+import type { JWTPayload } from 'jose';
 import { hashPassword, hashToken, newIngestionKey, newSessionToken, verifyPassword } from '../auth/crypto';
+import { keycloakSettings, verifyKeycloakAccessToken } from '../auth/keycloak';
 import { PLANS, planById, stripeConfigured } from '../billing/plans';
 import { CAVEAT } from '../domain/paper';
 import { applyIngest } from '../ingest';
@@ -122,6 +125,26 @@ export function createApp(prisma: PrismaClient) {
       },
       201,
     );
+  });
+
+  app.get('/api/auth/keycloak', (c) => {
+    const settings = keycloakSettings();
+    if (!settings.enabled) return c.json({ enabled: false });
+    return c.json({ enabled: true, url: settings.url, realm: settings.realm, clientId: settings.clientId });
+  });
+
+  app.post('/api/auth/keycloak', async (c) => {
+    if (!keycloakSettings().enabled) return c.json({ error: 'keycloak_not_configured' }, 503);
+    const body = (await c.req.json().catch(() => null)) as { accessToken?: string } | null;
+    if (!body?.accessToken) return c.json({ error: 'invalid_body' }, 400);
+    try {
+      const claims = await verifyKeycloakAccessToken(body.accessToken);
+      const user = await upsertKeycloakUser(prisma, claims);
+      await startSession(c, prisma, user.id);
+      return c.json({ user: publicUser(user) });
+    } catch {
+      return c.json({ error: 'invalid_keycloak_token' }, 401);
+    }
   });
 
   app.post('/api/auth/login', async (c) => {
@@ -358,6 +381,27 @@ export function createApp(prisma: PrismaClient) {
   });
 
   return app;
+}
+
+async function upsertKeycloakUser(prisma: PrismaClient, claims: JWTPayload): Promise<User> {
+  const sub = String(claims.sub);
+  const emailClaim = typeof claims.email === 'string' ? claims.email.toLowerCase() : '';
+  const username = typeof claims.preferred_username === 'string' ? claims.preferred_username : sub;
+  const email = emailClaim || `${username.replace(/[^a-z0-9._-]/gi, '') || 'user'}@users.keycloak`;
+  const name = typeof claims.name === 'string' && claims.name.trim() ? claims.name.trim() : username;
+  const linked = await prisma.user.findUnique({ where: { keycloakSub: sub } });
+  if (linked) return prisma.user.update({ where: { id: linked.id }, data: { name } });
+  const byEmail = emailClaim ? await prisma.user.findUnique({ where: { email: emailClaim } }) : null;
+  if (byEmail) return prisma.user.update({ where: { id: byEmail.id }, data: { keycloakSub: sub, name } });
+  return prisma.user.create({
+    data: {
+      email,
+      name,
+      passwordHash: await hashPassword(randomBytes(24).toString('base64url')),
+      keycloakSub: sub,
+      memberships: { create: { role: 'owner', workspace: { create: { name: `${name} desk` } } } },
+    },
+  });
 }
 
 function publicUser(user: User) {

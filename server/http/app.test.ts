@@ -187,6 +187,17 @@ test('auth, ingest, and dashboard use the sample ledger and isolate workspaces',
   });
   expect(blocked.status).toBe(423);
 
+  const keycloak = await app.request('/api/auth/keycloak');
+  expect(keycloak.status).toBe(200);
+  const keycloakBody = (await keycloak.json()) as { enabled: boolean };
+  expect(keycloakBody.enabled).toBe(false);
+  const keycloakLogin = await app.request('/api/auth/keycloak', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ accessToken: 'not-a-token' }),
+  });
+  expect(keycloakLogin.status).toBe(503);
+
   const anon = await app.request('/api/dashboard');
   expect(anon.status).toBe(401);
 

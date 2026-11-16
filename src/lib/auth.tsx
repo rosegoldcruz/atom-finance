@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 import { api } from './api';
 import type { SessionPayload } from '../types';
 
@@ -15,7 +15,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<SessionPayload | null>(null);
   const [loading, setLoading] = useState(true);
 
-  async function refresh() {
+  const refresh = useCallback(async () => {
     try {
       const next = await api<SessionPayload>('/api/session');
       setSession(next);
@@ -24,11 +24,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
   useEffect(() => {
     void refresh();
-  }, []);
+  }, [refresh]);
 
   useEffect(() => {
     document.documentElement.classList.toggle('crt-off', session?.workspace.crtOverlay === false);

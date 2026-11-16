@@ -1,7 +1,8 @@
-import { useState, type FormEvent, type ReactNode } from 'react';
+import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
 import { useAuth } from '../lib/auth';
+import { ensureKeycloak, type KeycloakPublicConfig } from '../lib/keycloak';
 import { useApi } from '../lib/useApi';
 import type { PlansPayload } from '../types';
 
@@ -222,8 +223,52 @@ function Field({ name, label, type = 'text' }: { name: string; label: string; ty
 }
 
 export function RequireAuth({ children }: { children: ReactNode }) {
-  const { session, loading } = useAuth();
-  if (loading) return <div className="p-8 font-mono text-xs text-atom-muted">Checking session…</div>;
-  if (!session) return <Navigate to="/login" replace />;
+  const { session, loading, refresh } = useAuth();
+  const [gate, setGate] = useState<'checking' | 'open' | 'locked'>('checking');
+  const [detail, setDetail] = useState('Checking Keycloak…');
+
+  useEffect(() => {
+    let cancel = false;
+    (async () => {
+      const config = await api<KeycloakPublicConfig>('/api/auth/keycloak');
+      if (!config.enabled) {
+        if (!cancel) {
+          setDetail('Set KEYCLOAK_URL so the console can open through Keycloak.');
+          setGate('locked');
+        }
+        return;
+      }
+      const signedIn = await ensureKeycloak(config);
+      const token = (await import('../lib/keycloak')).keycloakClient(config).token;
+      if (!signedIn || !token) {
+        if (!cancel) {
+          setDetail('Keycloak did not return a session.');
+          setGate('locked');
+        }
+        return;
+      }
+      await api('/api/auth/keycloak', { method: 'POST', body: JSON.stringify({ accessToken: token }) });
+      await refresh();
+      if (!cancel) setGate('open');
+    })().catch(() => {
+      if (!cancel) {
+        setDetail('Keycloak login did not complete.');
+        setGate('locked');
+      }
+    });
+    return () => {
+      cancel = true;
+    };
+  }, [refresh]);
+
+  if (gate === 'checking' || loading) return <div className="p-8 font-mono text-xs text-atom-muted">Checking Keycloak…</div>;
+  if (gate === 'locked' || !session) {
+    return (
+      <div className="p-8">
+        <h1 className="font-mono text-sm uppercase tracking-widest text-white">Console locked</h1>
+        <p className="mt-3 max-w-lg font-mono text-[11px] leading-relaxed text-atom-muted">{detail}</p>
+      </div>
+    );
+  }
   return children;
 }

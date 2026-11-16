@@ -21,7 +21,7 @@ ATOM runs as three long-lived containers: the web UI, the API, and Postgres. Cad
    docker compose up -d --build
    ```
 
-   Open `http://<server>:8080`. Postgres is bound to `127.0.0.1` only.
+   Open `http://<server>:8080`. The console at `/app` redirects to Keycloak (`KEYCLOAK_PUBLIC_URL`, port 8081 by default). Create the operator in the Keycloak admin console for realm `atom`. Postgres is bound to `127.0.0.1` only. Add the public site URL to the `atom-web` client's valid redirect URIs if it is not localhost.
 
 5. Create the first workspace in the UI, or load the sample scanner logs:
 
